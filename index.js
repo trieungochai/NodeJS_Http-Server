@@ -1,4 +1,5 @@
 const http = require("http");
+const { freemem } = require("os");
 
 const PORT = 3000;
 
@@ -22,8 +23,14 @@ const friends = [
 
 server.on("request", (req, res) => {
   const item = req.url.split("/");
-  // console.log(req.url.split("/"));
-  if (item[1] === "friends") {
+
+  if (req.method === "POST" && item[1] === "friends") {
+    req.on("data", (data) => {
+      const friend = data.toString();
+      console.log("Request:", friend);
+      friends.push(JSON.parse(friend));
+    });
+  } else if (req.method === "GET" && item[1] === "friends") {
     res.statusCode = 200;
     res.setHeader("Content-Type", "application/json");
     if (item.length === 3) {
